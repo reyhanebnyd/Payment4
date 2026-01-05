@@ -3,8 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
 from django.contrib.auth import login
-from .serializers import SignupSerializer, LoginSerializer, ProfileSerializer
-
+from .serializers import SignupSerializer, ProfileSerializer, MyTokenObtainPairSerializer, ChangePasswordSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 class SignupAPIView(APIView):
     def post(self, request):
@@ -14,12 +14,6 @@ class SignupAPIView(APIView):
         return Response({"message": "User created"}, status=201)
 
 
-class LoginAPIView(APIView):
-    def post(self, request):
-        serializer = LoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        login(request, serializer.validated_data['user'])
-        return Response({"message": "Logged in"})
 
 
 class ProfileAPIView(APIView):
@@ -39,3 +33,20 @@ class ProfileAPIView(APIView):
         serializer.save()
         return Response(serializer.data)
 
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+
+
+class ChangePasswordAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def put(self, request):
+        serializer = ChangePasswordSerializer(
+            data=request.data,
+            context={'request': request}
+        )
+        serializer.is_valid(raise_exception=True)
+        request.user.set_password(serializer.validated_data['new_password'])
+        request.user.save()
+        return Response({"message": "Password updated successfully"}, status=200)    
