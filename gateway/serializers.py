@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Gateway
+from .models import Gateway, GatewayBalance
 from assets.models import Asset
 
 class GatewaySerializer(serializers.ModelSerializer):
@@ -13,3 +13,12 @@ class GatewaySerializer(serializers.ModelSerializer):
                   'phone_number', 'transaction_fee_payer', 'commission_fee_payer', 
                   'cover_type', 'cover_range_up', 'cover_range_down']
 
+class GatewayBalanceSerializer(serializers.ModelSerializer):
+    fiat_balance = serializers.SerializerMethodField()
+
+    class Meta:
+        model = GatewayBalance
+        fields = ['asset', 'balance', 'fiat_balance']
+
+    def get_fiat_balance(self, obj):
+        return obj.balance * obj.asset.usd_price    

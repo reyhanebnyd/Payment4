@@ -50,3 +50,13 @@ class Gateway(models.Model):
     cover_range_down = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     
 
+class GatewayBalance(models.Model):
+    gateway = models.ForeignKey(Gateway, on_delete=models.CASCADE, related_name='balances')
+    asset = models.ForeignKey('assets.Asset', on_delete=models.CASCADE, related_name='gateway_balances')
+    balance = models.DecimalField(max_digits=30, decimal_places=10, default=0.0)
+
+    class Meta:
+        unique_together = ('gateway', 'asset')
+
+    def __str__(self):
+        return f"{self.gateway.name} - {self.asset.symbol}: {self.balance}"

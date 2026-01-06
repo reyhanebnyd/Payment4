@@ -16,7 +16,9 @@ class Transaction(models.Model):
         ('direct', 'Direct'), 
         ('paylink', 'Paylink'),
     ]
-
+    customer_name = models.CharField(max_length=100, blank=True, null=True)
+    customer_email = models.EmailField(max_length=100, blank=True, null=True)
+    customer_mobile = models.CharField(max_length=20, blank=True, null=True)
     gateway = models.ForeignKey(Gateway, on_delete=models.CASCADE, related_name='transactions')
     asset_network = models.ForeignKey(AssetNetwork, on_delete=models.CASCADE, related_name='transactions')
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE, related_name='transactions')
@@ -26,6 +28,8 @@ class Transaction(models.Model):
     payment_UID = models.CharField(max_length=100, unique=True, blank=False, null=False)
     details = models.TextField(blank=True, null=True)
     transaction_hash = models.CharField(max_length=200, blank=True, null=True, unique=True)
+    type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='direct')
+    paylink = models.ForeignKey('paylink.Paylink', on_delete=models.CASCADE, related_name='transactions', null=True, blank=True)
 
 
     def __str__(self):
